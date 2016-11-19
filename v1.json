@@ -1,0 +1,14 @@
+[
+  {
+   "name":"hello-world",
+   "status":200,
+   "body":"Hello world!",
+   "headers":{"X-My-Hello-Header":"true"}
+ },
+ {
+  "name":"goodbye-world",
+  "status":400,
+  "body":"Goodbye world!",
+  "headers":{"X-My-Goodbye-Header":"true"}
+  }
+]
