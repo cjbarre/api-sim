@@ -1,0 +1,38 @@
+[
+  {"name":"hello",
+   "behavior":"static",
+   "status":200,
+   "headers":{},
+   "body":"<a href='/info'> Hello, I'm an API simulation. Follow the link to learn more!</a>"},
+ {
+   "name":"info",
+   "behavior":"static",
+   "status":200,
+   "headers":{},
+   "body":"<a href='/info-2'> What's an API simulation you ask? The short version is that it's a mock API, capable of simulating the behaviors of other APIs. Follow the link!"
+ },
+ {
+   "name":"info-2",
+   "behavior":"static",
+   "status":200,
+   "headers":{},
+   "body":"<div>I was set up in about 5 minutes using a simple config file! The endpoints you have seen until now return static HTML.</div>
+           <br>
+           <div>I didn't catch your name: </div>
+           <div>
+             <form action='/username' method='GET'>
+              <br>
+              <input name=username type='text' placeholder='Your name, please'>
+              <br><br>
+              <input type='submit' value='submit'>
+            </div>"
+ },
+ {
+   "name":"username",
+   "behavior":"dynamic",
+   "parameters":["username"],
+   "status":200,
+   "headers":{},
+   "body":"Nice to meet you, {username}! I hope you have enjoyed this short demonstration of my abilities :-)"
+ }
+]
