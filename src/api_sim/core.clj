@@ -10,11 +10,6 @@
 
 (def api-spec (json/read-str (slurp "api-spec.json") :key-fn keyword))
 
-(defmulti make-endpoint
-  "Make an endpoint handler."
-  ;; Either static or dynamic
-  (fn [endpoint-spec] (:behavior endpoint-spec)))
-
 (defn fill-template
   [template parameters]
   (if (empty? parameters) template
@@ -27,26 +22,28 @@
                (->> (clojure.string/replace match #"\{|\}" "")
                     (get parameters)))))))))
 
+(defn prepare-route-param
+  [route-piece]
+  (let [regexp #"\{[a-zA-Z]+\}"
+        param? (re-find regexp route-piece)]
+    (if-not param? (str route-piece "/")
+      (keyword (clojure.string/replace route-piece #"\{|\}" "")))))
 
-(defmethod make-endpoint "static"
+(defn make-route
+  [endpoint-name]
+  (->> (clojure.string/split endpoint-name #"/")
+       (map prepare-route-param)
+       (into [])))
+
+(defn make-endpoint
   [endpoint-spec]
   (let [headers (walk/stringify-keys (:headers endpoint-spec))
         {:keys [name status body]} endpoint-spec]
-    {name (fn
-           [request]
-           {:status status
-            :body body
-            :headers headers})}))
-
-(defmethod make-endpoint "dynamic"
-  [endpoint-spec]
-  (let [headers (walk/stringify-keys (:headers endpoint-spec))
-        {:keys [name status body]} endpoint-spec]
-    {name (fn
-           [request]
-           {:status status
-            :body (fill-template body (:params request))
-            :headers headers})}))
+    {(make-route name)
+     (fn [request]
+         {:status status
+          :body (fill-template body (merge (walk/stringify-keys (:route-params request)) (:params request)))
+          :headers headers})}))
 
 (defn make-endpoints
   [api-spec]
