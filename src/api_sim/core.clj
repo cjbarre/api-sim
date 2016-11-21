@@ -2,8 +2,6 @@
   (:gen-class)
   (:require [ring.adapter.jetty :as jetty]
             [clojure.data.json :as json]
-            [compojure.core :refer :all]
-            [compojure.route :as route]
             [clojure.walk :as walk]
             [bidi.ring :as bidi]
             [ring.util.response :as r]
@@ -47,7 +45,7 @@
     {name (fn
            [request]
            {:status status
-            :body (fill-template body (:query-params request))
+            :body (fill-template body (:params request))
             :headers headers})}))
 
 (defn make-endpoints

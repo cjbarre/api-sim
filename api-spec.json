@@ -3,7 +3,13 @@
    "behavior":"static",
    "status":200,
    "headers":{},
-   "body":"<a href='/info'> Hello, I'm an API simulation. Follow the link to learn more!</a>"},
+   "body":"<style>
+             body {
+             font-size: 100%;
+             line-height: 1.6875;
+             font-family:Georgia;}
+           </style>
+           <a href='/info'> Hello, I'm an API simulation. Follow the link to learn more!</a>"},
  {
    "name":"info",
    "behavior":"static",
