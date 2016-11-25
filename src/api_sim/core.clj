@@ -22,17 +22,19 @@
                (->> (clojure.string/replace match #"\{|\}" "")
                     (get parameters)))))))))
 
-(defn prepare-route-param
-  [route-piece]
-  (let [regexp #"\{[a-zA-Z]+\}"
-        param? (re-find regexp route-piece)]
-    (if-not param? (str route-piece "/")
-      (keyword (clojure.string/replace route-piece #"\{|\}" "")))))
+(defn split-route
+  [route-string]
+  (clojure.string/split route-string #"\{|\}"))
+
+(defn keywordify-route
+  [route-coll]
+  (doall (map #(if-not (re-find #"/" %) (keyword %) %) route-coll)))
 
 (defn make-route
   [endpoint-name]
-  (->> (clojure.string/split endpoint-name #"/")
-       (map prepare-route-param)
+  (->> endpoint-name
+       split-route
+       keywordify-route
        (into [])))
 
 (defn make-endpoint
