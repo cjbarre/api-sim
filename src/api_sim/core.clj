@@ -47,10 +47,13 @@
           :body (fill-template body (merge (walk/stringify-keys (:route-params request)) (:params request)))
           :headers headers})}))
 
-(defn make-endpoints
-  [api-spec]
-  ["/"
-   (->> (map make-endpoint api-spec) (reduce merge))])
+(defn make-endpoints [{:keys [root endpoints] :as api-spec}]
+  ; 1. Generate the route
+  ; 2. Generate the route hander
+  ; 3. Generate the root
+  ; 4. Generate the method restriction
+  [(if root root "/") ;; Should be configurable root.
+   (->> (map make-endpoint endpoints) (reduce merge))])
 
 (def api-sim
   (bidi/make-handler (make-endpoints api-spec)))
