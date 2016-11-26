@@ -6,7 +6,8 @@
             [bidi.ring :as bidi]
             [ring.util.response :as r]
             [ring.middleware.params :as p]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [api-sim.endpoint :refer [make-route]]))
 
 (def api-spec (json/read-str (slurp "api-spec.json") :key-fn keyword))
 
@@ -22,37 +23,21 @@
                (->> (clojure.string/replace match #"\{|\}" "")
                     (get parameters)))))))))
 
-(defn split-route
-  [route-string]
-  (clojure.string/split route-string #"\{|\}"))
-
-(defn keywordify-route
-  [route-coll]
-  (doall (map #(if-not (re-find #"/" %) (keyword %) %) route-coll)))
-
-(defn make-route
-  [endpoint-name]
-  (->> endpoint-name
-       split-route
-       keywordify-route
-       (into [])))
-
 (defn make-endpoint
-  [endpoint-spec]
-  (let [headers (walk/stringify-keys (:headers endpoint-spec))
-        {:keys [name status body]} endpoint-spec]
-    {(make-route name)
-     (fn [request]
-         {:status status
-          :body (fill-template body (merge (walk/stringify-keys (:route-params request)) (:params request)))
-          :headers headers})}))
+  [{:keys [name status headers body method] :as endpoint-spec}]
+  (let [route (make-route name)
+        handler-fn (fn [{:keys [route-params params] :as request}]
+                    {:status status
+                     :body (fill-template body (merge (walk/stringify-keys route-params) params))
+                     :headers (walk/stringify-keys headers)})
+        built-route {route handler-fn}]
+    (if-not method built-route
+      {(keyword method) built-route})))
+
+
 
 (defn make-endpoints [{:keys [root endpoints] :as api-spec}]
-  ; 1. Generate the route
-  ; 2. Generate the route hander
-  ; 3. Generate the root
-  ; 4. Generate the method restriction
-  [(if root root "/") ;; Should be configurable root.
+  [(if root root "/")
    (->> (map make-endpoint endpoints) (reduce merge))])
 
 (def api-sim
