@@ -2,13 +2,8 @@
   (:require [clojure.test :refer :all]
             [api-sim.endpoint :refer :all]))
 
-(deftest test-make-route
-  (is (= ["user/" :name] (make-route "user/{name}")))
-
-  (is (= ["user/" :id "/name"] (make-route "user/{id}/name")))
-
-  (is (= ["user/" :id :name "/beep"] (make-route "user/{id}/{name}/beep")))
-
-  (is (= ["user/" :id :address :city "/beep"] (make-route "user/{id}/{address}/{city}/beep")))
-
-  (is (= ["user/" :id "/address/city"] (make-route "user/{id}/address/city"))))
+(deftest test-active?
+  (is (= 1 (count (filter active? [{:active true} {:active false}]))))
+  (is (= 2 (count (filter active? [{:active true} {:active true}]))))
+  (is (= 0 (count (filter active? [{:active false} {:active false}]))))
+  (is (= 1 (count (filter active? [{} {:active true}])))))

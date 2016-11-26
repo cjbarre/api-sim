@@ -7,7 +7,8 @@
             [ring.util.response :as r]
             [ring.middleware.params :as p]
             [clojure.string :as string]
-            [api-sim.endpoint :refer [make-route]]))
+            [api-sim.route :refer [make-route]]
+            [api-sim.endpoint :refer [active?]]))
 
 (def api-spec (json/read-str (slurp "api-spec.json") :key-fn keyword))
 
@@ -38,7 +39,9 @@
 
 (defn make-endpoints [{:keys [root endpoints] :as api-spec}]
   [(if root root "/")
-   (->> (map make-endpoint endpoints) (reduce merge))])
+   (->> (filter active? endpoints)
+        (map make-endpoint)
+        (reduce merge))])
 
 (def api-sim
   (bidi/make-handler (make-endpoints api-spec)))
