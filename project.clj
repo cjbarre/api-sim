@@ -9,6 +9,7 @@
                  [ring/ring-jetty-adapter "1.5.0"]
                  [org.clojure/data.json "0.2.6"]
                  [bidi "2.0.14"]]
-  :main ^:skip-aot api-sim.core
+  :aot :all
+  :main api-sim.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
