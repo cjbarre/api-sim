@@ -2,12 +2,10 @@
   (:gen-class)
   (:require [ring.adapter.jetty :as jetty]
             [clojure.data.json :as json]
-            [clojure.walk :as walk]
             [bidi.ring :as bidi]
             [ring.util.response :as r]
             [ring.middleware.params :as p]
-            [clojure.string :as string]
-            [api-sim.endpoint :refer [active? make-endpoints]]))
+            [api-sim.endpoint :refer [make-endpoints]]))
 
 (defn -main
   "I don't do a whole lot ... yet."
