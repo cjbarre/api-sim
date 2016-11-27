@@ -1,6 +1,6 @@
 (ns api-sim.endpoint
   (:require [api-sim.route :refer [make-route]]
-            [api-sim.response :refer [fill-template]]
+            [api-sim.response :refer [response status headers body]]
             [clojure.walk :as walk]))
 
 (defn active?
@@ -8,37 +8,27 @@
   (let [active-flag (:active endpoint)]
     (= true active-flag)))
 
-(defn- make-endpoint
-  [{:keys [name status headers body method] :as endpoint-spec}]
-  (let [route (make-route name)
-        handler-fn (fn [{:keys [route-params params] :as request}]
-                    {:status status
-                     :body (fill-template body (merge (walk/stringify-keys route-params) params))
-                     :headers (walk/stringify-keys headers)})
-        built-route {route handler-fn}]
-    (if-not method built-route
-      {(keyword method) built-route})))
+(defn handler [endpoint-spec]
+  (fn [request]
+    (response
+      (status endpoint-spec)
+      (headers endpoint-spec)
+      (body endpoint-spec request))))
 
-(defn- handler [{:keys [status headers body] :as endpoint-spec}]
-  (fn [{:keys [route-params params] :as request}]
-    {:status status
-     :body (fill-template body (merge (walk/stringify-keys route-params) params))
-     :headers (walk/stringify-keys headers)}))
-
-(defn- route [{:keys [name] :as endpoint-spec}]
+(defn route [{:keys [name] :as endpoint-spec}]
   (make-route name))
 
-(defn- method [{:keys [method] :as endpoint-spec}]
+(defn method [{:keys [method] :as endpoint-spec}]
   (if-not method nil
     (-> method
         clojure.string/lower-case
         keyword)))
 
-(defn- endpoint [method route handler]
+(defn endpoint [method route handler]
   (if-not method {route handler}
     {method {route handler}}))
 
-(defn- make-endpoint
+(defn make-endpoint
   [endpoint-spec]
   (endpoint
     (method endpoint-spec)
