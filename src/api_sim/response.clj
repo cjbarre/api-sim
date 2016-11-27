@@ -1,5 +1,6 @@
 (ns api-sim.response
-  (:require [clojure.walk :as walk]))
+  (:require [clojure.walk :as walk]
+            [clojure.data.json :as json]))
 
 (defn fill-template
   [template parameters]
@@ -19,8 +20,10 @@
     {:headers (walk/stringify-keys headers)}))
 
 (defn body [{:keys [body] :as endpoint-spec} {:keys [route-params params] :as request}]
-  (if-not body {:body ""}
-    {:body (fill-template body (merge (walk/stringify-keys route-params) params))}))
+  (cond
+    (nil? body) {:body ""}
+    (map? body) {:body (-> body (json/write-str :key-fn name) (fill-template (walk/stringify-keys (merge route-params params))))}
+    :else {:body (-> body (fill-template (walk/stringify-keys (merge route-params params))))}))
 
 (defn status [{:keys [status] :as endpoint-spec}]
   (if-not status {:status 200}
