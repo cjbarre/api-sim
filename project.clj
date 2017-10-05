@@ -8,6 +8,7 @@
                  [ring/ring-core "1.5.0"]
                  [ring/ring-jetty-adapter "1.5.0"]
                  [org.clojure/data.json "0.2.6"]
+                 [com.taoensso/timbre "4.10.0"]
                  [bidi "2.0.14"]]
   :aot :all
   :main api-sim.core
